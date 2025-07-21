@@ -10,6 +10,8 @@ async function bootstrap() {
   const logger = new Logger('Bootstrap');
 
   // Swagger setup
+  // Swagger setup
+
   const config = new DocumentBuilder()
     .setTitle('Blog API')
     .setDescription('Dokumentasi API Blog')
