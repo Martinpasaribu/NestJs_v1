@@ -4,7 +4,8 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { Connection } from 'mongoose';
 import { AppController } from './app.controller';
 import { BlogModule } from './blog/blog.module';
-import { RedisModule } from '@nestjs-modules/ioredis';
+// import { RedisModule } from '@nestjs-modules/ioredis';
+import { RedisProvider } from './config/redis.provider';
 
 @Module({
   imports: [
@@ -17,15 +18,18 @@ import { RedisModule } from '@nestjs-modules/ioredis';
       inject: [ConfigService],
     }),
     BlogModule,
-    RedisModule.forRootAsync({
-      imports: [ConfigModule],
-      inject: [ConfigService],
-      useFactory: (config: ConfigService) => ({
-        url: config.get<string>('REDIS_URL'), // Gunakan 'url' BUKAN 'uri'
-        type: 'single', // opsional, kalau kamu yakin Redis-mu single instance
-      }),
-    }),
+    // RedisModule.forRootAsync({
+    //   imports: [ConfigModule],
+    //   inject: [ConfigService],
+    //   useFactory: (config: ConfigService) => ({
+    //     url: config.get<string>('REDIS_URL'), // Gunakan 'url' BUKAN 'uri'
+    //     type: 'single', // opsional, kalau kamu yakin Redis-mu single instance
+    //   }),
+    // }),
   ],
+  providers: [RedisProvider],
+  exports: [RedisProvider],
+  
   controllers: [AppController],
 })
 export class AppModule implements OnApplicationBootstrap {

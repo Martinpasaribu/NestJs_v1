@@ -1,18 +1,17 @@
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { Blog, BlogDocument } from './schemas/blog-schema';
 import { CreateBlogDto } from './dto/create-blog.dto';
 import { UpdateBlogDto } from './dto/update-blog.dto';
 import { NotFoundException } from '@nestjs/common';
-import { InjectRedis } from '@nestjs-modules/ioredis';
-import { Redis } from 'ioredis'; // ← pakai dari ioredis langsung
+import { Redis,  } from 'ioredis'; // ← pakai dari ioredis langsung
 
 @Injectable()
 export class BlogService {
   constructor(
     @InjectModel(Blog.name) private blogModel: Model<BlogDocument>,
-    @InjectRedis() private readonly redis: Redis, // Redis Cloud
+    @Inject('REDIS_CLIENT') private readonly redis: Redis, // Redis Cloud
   ) {}
 
   async getAllBlogs(
