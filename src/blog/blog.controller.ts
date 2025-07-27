@@ -47,6 +47,16 @@ export class BlogController {
     return this.blogService.FindBlogBySlug(slug, id, ip);
   }
 
+  
+  @Get('/detail-category/:category')
+  getDetailCategorys(
+    @Param('category') category: string,
+    @Query('page') page : number,
+    @Query('limit') limit : number,
+  ) {
+    return this.blogService.getDetailCategory(category, page, limit);
+  }
+
   @Get('/detail-category-navbar')
   getBlogsByNavbarQuery(@Query('category') category: string) {
     return this.blogService.findByCategoryNavbar(category);
@@ -70,11 +80,6 @@ export class BlogController {
   @Get()
   findAll() {
     return this.blogService.findAll();
-  }
-
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.blogService.findOne(id);
   }
 
   @Put(':id')

@@ -56,13 +56,42 @@ export class BlogService {
     };
   }
 
+  async getDetailCategory(category: string, page : number , limit : number) {
+    const skip = (page - 1) * limit;
+
+    // Ambil data full berdasarkan kategori
+    const fullData = await this.blogModel.find(
+      { category , isDeleted: false },
+      ).sort({ createdAt: -1 }).exec();
+
+
+    // Pisahkan data
+    const latest = fullData[0] || null;
+    const nextThree = fullData.slice(1, 4); // setelah pertama, ambil 3 berikutnya
+
+    // Pagination response
+    const paginatedData = fullData.slice(skip, skip + limit);
+
+    return {
+      latest,
+      nextThree,
+      fullData: paginatedData,
+      total: fullData.length,
+      page,
+      limit,
+      category,
+      totalPages: Math.ceil(fullData.length / limit),
+    };
+  }
+
   async FindBlogBySlug(slug: string, id: string, ip: string) {
     // 1. Cari berdasarkan slug
-    let blog = await this.blogModel.findOne({ slug }).exec();
+    // eslint-disable-next-line max-len
+    let blog = await this.blogModel.findOne({ slug }).populate('author', 'name email bio images -_id').exec();
 
     // 2. Jika tidak ada, cari berdasarkan ID
     if (!blog && id) {
-      blog = await this.blogModel.findById(id).exec();
+      blog = await this.blogModel.findById(id).populate('author', 'name email bio images').exec();
     }
 
     if (!blog) {
@@ -113,12 +142,12 @@ export class BlogService {
       .sort({ createdAt: -1 })
       .exec();
 
-    const latest = fullRaw[0] || null;
-    const nextThree = fullRaw.slice(1, 4);
+    const main = fullRaw[0] || null;
+    const main_sub = fullRaw.slice(1, 4);
 
     return {
-      latest,
-      nextThree,
+      main,
+      main_sub,
       total: fullRaw.length,
       totalPages: Math.ceil(fullRaw.length),
     };
@@ -189,13 +218,13 @@ export class BlogService {
     return this.blogModel.find().exec();
   }
 
-  async findOne(id: string): Promise<Blog> {
-    const blog = await this.blogModel.findById(id).exec();
-    if (!blog) {
-      throw new NotFoundException(`Blog dengan ID ${id} tidak ditemukan`);
-    }
-    return blog;
-  }
+  // async findOne(id: string): Promise<Blog> {
+  //   const blog = await this.blogModel.findById(id).exec();
+  //   if (!blog) {
+  //     throw new NotFoundException(`Blog dengan ID ${id} tidak ditemukan`);
+  //   }
+  //   return blog;
+  // }
 
   async update(id: string, updateItemDto: UpdateBlogDto): Promise<Blog> {
     const updated = await this.blogModel

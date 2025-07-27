@@ -1,5 +1,5 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { Document } from 'mongoose';
+import mongoose, { Document } from 'mongoose';
 import { ApiProperty } from '@nestjs/swagger';
 
 export type BlogDocument = Blog & Document;
@@ -47,19 +47,24 @@ export class Blog {
   images: string[];
 
   @ApiProperty()
-  @Prop()
+  @Prop({ type: String }) 
   category: string;
 
   @ApiProperty({ type: [String] })
   @Prop([String])
   tags: string[];
 
-  @ApiProperty()
-  @Prop()
-  author: string;
+  @ApiProperty({ type: String }) // Hanya tampilkan sebagai string ID di Swagger
+  @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Author', required: true })
+  author: mongoose.Types.ObjectId;
 
   @ApiProperty({ type: Date })
   createdAt: Date;
+
+  @ApiProperty()
+  @Prop({ default: false })
+  isDeleted: boolean;
+  
 
   @ApiProperty({ type: Date })
   updatedAt: Date;
