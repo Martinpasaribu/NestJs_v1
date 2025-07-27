@@ -37,6 +37,7 @@ export class CreateBlogDto {
   @ApiProperty({ type: [String] })
   tags: string[];
 
-  @ApiProperty()
-  author: string;
+@ApiProperty({ type: String, description: 'ID dari author' })
+author: string; // <- ini boleh string karena user input ID (bukan nama)
+
 }
