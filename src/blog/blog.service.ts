@@ -25,7 +25,8 @@ export class BlogService {
   }> {
     const skip = (page - 1) * limit;
     const [data, total] = await Promise.all([
-      this.blogModel.find().sort({ createdAt: -1 }).skip(skip).limit(limit).exec(),
+      // eslint-disable-next-line max-len
+      this.blogModel.find().sort({ createdAt: -1 }).skip(skip).limit(limit).populate('author', 'name email bio images -_id').exec(),
       this.blogModel.countDocuments(),
     ]);
 
@@ -36,7 +37,8 @@ export class BlogService {
     const skip = (page - 1) * limit;
 
     // Ambil data full berdasarkan kategori
-    const fullData = await this.blogModel.find({ category }).sort({ createdAt: -1 }).exec();
+    // eslint-disable-next-line max-len
+    const fullData = await this.blogModel.find({ category }).sort({ createdAt: -1 }).populate('author', 'name email bio images -_id').exec();
 
     // Pisahkan data
     const latest = fullData[0] || null;
@@ -62,7 +64,7 @@ export class BlogService {
     // Ambil data full berdasarkan kategori
     const fullData = await this.blogModel.find(
       { category , isDeleted: false },
-      ).sort({ createdAt: -1 }).exec();
+      ).sort({ createdAt: -1 }).populate('author', 'name email bio images -_id').exec();
 
 
     // Pisahkan data
@@ -118,7 +120,7 @@ export class BlogService {
     const relatedBlogs = await this.blogModel.find({
       _id: { $ne: blog._id },
       category: blog.category,
-    }).limit(3).exec();
+    }).limit(3).populate('author', 'name email bio images -_id').exec();
 
     return {
       data: blog,
@@ -140,6 +142,7 @@ export class BlogService {
     const fullRaw = await this.blogModel
       .find({ category }, projection)
       .sort({ createdAt: -1 })
+      .populate('author', 'name email bio images -_id')
       .exec();
 
     const main = fullRaw[0] || null;
@@ -165,6 +168,7 @@ export class BlogService {
       .find({}, projection)
       .sort({ createdAt: -1 }) // Urutkan dari terbaru
       .limit(1)
+      .populate('author', 'name email bio images -_id')
       .lean();
 
     // Ambil 3 artikel setelah yang terbaru
@@ -173,6 +177,7 @@ export class BlogService {
       .sort({ createdAt: -1 })
       .skip(1)
       .limit(3)
+      .populate('author', 'name email bio images -_id')
       .lean();
 
     return {
@@ -193,6 +198,7 @@ export class BlogService {
       .find({}, projection)
       .sort({ views: -1 }) // Urutkan dari view terbanyak
       .limit(3)
+      .populate('author', 'name email bio images -_id')
       .lean();
 
     // Ambil 3 artikel setelah yang terbaru
@@ -201,6 +207,7 @@ export class BlogService {
       .sort({ createdAt: -1 })
       .skip(1)
       .limit(3)
+      .populate('author', 'name email bio images -_id')
       .lean();
 
     return {
@@ -215,7 +222,7 @@ export class BlogService {
   }
 
   async findAll(): Promise<Blog[]> {
-    return this.blogModel.find().exec();
+    return this.blogModel.find().populate('author', 'name email bio images -_id').exec();
   }
 
   // async findOne(id: string): Promise<Blog> {
@@ -231,6 +238,7 @@ export class BlogService {
       .findByIdAndUpdate(id, updateItemDto, {
         new: true,
       })
+      .populate('author', 'name email bio images -_id')
       .exec();
     if (!updated) {
       throw new NotFoundException(`Blog dengan ID ${id} tidak ditemukan`);
@@ -239,7 +247,8 @@ export class BlogService {
   }
 
   async remove(id: string): Promise<Blog> {
-    const deleted = await this.blogModel.findByIdAndDelete(id).exec();
+    // eslint-disable-next-line max-len
+    const deleted = await this.blogModel.findByIdAndDelete(id).populate('author', 'name email bio images -_id').exec();
     if (!deleted) {
       throw new NotFoundException(`Blog dengan ID ${id} tidak ditemukan`);
     }
