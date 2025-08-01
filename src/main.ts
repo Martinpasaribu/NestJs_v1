@@ -3,9 +3,14 @@ import { AppModule } from './app.module';
 import { Logger } from '@nestjs/common';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import mongoose from 'mongoose';
+import { RateLimitMiddleware } from './common/middleware/rate-limit.middleware';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+    // Middleware global
+  // eslint-disable-next-line @typescript-eslint/unbound-method
+  app.use(new RateLimitMiddleware().use);
+
   const port = process.env.PORT || 5002;
   const logger = new Logger('Bootstrap');
 

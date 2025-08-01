@@ -7,6 +7,7 @@ import { BlogModule } from './blog/blog.module';
 // import { RedisModule } from '@nestjs-modules/ioredis';
 import { RedisProvider } from './config/redis.provider';
 import { AuthorModule } from './author/author.module';
+import { OrdersModule } from './orders/orders.module';
 
 @Module({
   imports: [
@@ -20,6 +21,7 @@ import { AuthorModule } from './author/author.module';
     }),
     BlogModule,
     AuthorModule,
+    OrdersModule
     // RedisModule.forRootAsync({
     //   imports: [ConfigModule],
     //   inject: [ConfigService],
