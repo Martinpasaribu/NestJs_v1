@@ -8,11 +8,12 @@ import { RateLimitMiddleware } from './common/middleware/rate-limit.middleware';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+  
+app.enableCors({
+  origin: ['http://localhost:3000', 'https://www.clickusaha.com'], // array of allowed origins
+  credentials: true, // izinkan kirim cookie/token cross-origin
+});
 
-  app.enableCors({
-    origin: 'http://localhost:3000', // izinkan akses dari Next.js
-    credentials: true,               // jika kamu pakai cookie/token
-  });
 
     // Middleware global
   // eslint-disable-next-line @typescript-eslint/unbound-method
