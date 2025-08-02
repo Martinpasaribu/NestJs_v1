@@ -57,6 +57,15 @@ export class BlogController {
     return this.blogService.getDetailCategory(category, page, limit);
   }
 
+  @Get('/detail-author/:author_name')
+  getAuthorBlog(
+    @Param('author_name') author_name: string,
+    @Query('page') page : number,
+    @Query('limit') limit : number,
+  ) {
+    return this.blogService.getAuthorBlog(author_name, page, limit);
+  }
+
   @Get('/detail-category-navbar')
   getBlogsByNavbarQuery(@Query('category') category: string) {
     return this.blogService.findByCategoryNavbar(category);

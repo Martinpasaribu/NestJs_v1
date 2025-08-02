@@ -6,11 +6,21 @@ import { CreateBlogDto } from './dto/create-blog.dto';
 import { UpdateBlogDto } from './dto/update-blog.dto';
 import { NotFoundException } from '@nestjs/common';
 import { Redis,  } from 'ioredis'; // ← pakai dari ioredis langsung
+import { Author, AuthorDocument } from 'src/author/schemas/author-schema';
+
+
+function slugToName(slug: string): string {
+  return slug
+    .split('-')                 // pisahkan berdasarkan "-"
+    .map(word => word.charAt(0).toUpperCase() + word.slice(1)) // kapitalisasi tiap kata
+    .join(' ');
+}
 
 @Injectable()
 export class BlogService {
   constructor(
     @InjectModel(Blog.name) private blogModel: Model<BlogDocument>,
+    @InjectModel(Author.name) private authorModel: Model<AuthorDocument>,
     @Inject('REDIS_CLIENT') private readonly redis: Redis, // Redis Cloud
   ) {}
 
@@ -85,6 +95,42 @@ export class BlogService {
       totalPages: Math.ceil(fullData.length / limit),
     };
   }
+
+async getAuthorBlog(author_name: string, page: number, limit: number) {
+  const skip = (page - 1) * limit;
+
+  // 1. Cari author berdasarkan nama
+  const formattedName = slugToName(author_name);
+  const author = await this.authorModel.findOne({ name: formattedName });
+
+  if (!author) {
+    throw new NotFoundException(`Author with name "${formattedName}" not found`);
+  }
+
+  // 2. Ambil semua blog berdasarkan author._id
+  const fullData = await this.blogModel.find(
+    { author: author._id, isDeleted: false },
+  )
+    .sort({ createdAt: -1 })
+    .populate('author', 'name email bio images') // populate tanpa -_id agar ID masih ikut
+    .exec();
+
+  // 3. Bagi data jadi latest, nextThree, dan paginated
+  const latest = fullData[0] || null;
+  const nextThree = fullData.slice(1, 4);
+  const paginatedData = fullData.slice(skip, skip + limit);
+
+  return {
+    latest,
+    nextThree,
+    fullData: paginatedData,
+    total: fullData.length,
+    page,
+    limit,
+    author_name,
+    totalPages: Math.ceil(fullData.length / limit),
+  };
+}
 
   async FindBlogBySlug(slug: string, id: string, ip: string) {
     // 1. Cari berdasarkan slug
