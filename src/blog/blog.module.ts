@@ -21,10 +21,11 @@ import { RateLimitMiddleware } from 'src/common/middleware/rate-limit.middleware
   providers: [BlogService, RedisProvider],
 })
 
-export class BlogModule implements NestModule {
-  configure(consumer: MiddlewareConsumer) {
-    consumer
-      .apply(RateLimitMiddleware)
-      .forRoutes({ path: 'api/v1/blogs', method: RequestMethod.ALL });
-  }
-}
+// export class BlogModule implements NestModule {
+//   configure(consumer: MiddlewareConsumer) {
+//     consumer
+//       .apply(RateLimitMiddleware)
+//       .forRoutes({ path: 'api/v1/blogs', method: RequestMethod.ALL });
+//   }
+// }
+export class BlogModule {}

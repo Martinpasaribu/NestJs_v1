@@ -18,10 +18,12 @@ import { RateLimitMiddleware } from 'src/common/middleware/rate-limit.middleware
   providers: [AuthorService, RedisProvider],
 })
 
-export class AuthorModule implements NestModule {
-  configure(consumer: MiddlewareConsumer) {
-    consumer
-      .apply(RateLimitMiddleware)
-      // .forRoutes({ path: '/author', method: RequestMethod.ALL });
-  }
-}
+// export class AuthorModule implements NestModule {
+//   configure(consumer: MiddlewareConsumer) {
+//     consumer
+//       .apply(RateLimitMiddleware)
+//       // .forRoutes({ path: '/author', method: RequestMethod.ALL });
+//   }
+// }
+
+export class AuthorModule {}
