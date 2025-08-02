@@ -3,7 +3,7 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { OrdersController } from './orders.controller';
 import { OrdersService } from './orders.service';
 import { Order, OrderSchema } from './schemas/order.schema';
-import { RateLimitMiddleware } from 'src/common/middleware/rate-limit.middleware';
+import { RateLimitMiddleware } from '../common/middleware/rate-limit.middleware';
 
 @Module({
   imports: [

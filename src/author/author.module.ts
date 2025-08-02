@@ -6,7 +6,7 @@ import { RedisProvider } from 'src/config/redis.provider';
 import { AuthorController } from './author.controller';
 import { AuthorService } from './author.service';
 import { Author, AuthorSchema } from './schemas/author-schema';
-import { RateLimitMiddleware } from 'src/common/middleware/rate-limit.middleware';
+// import { RateLimitMiddleware } from 'src/common/middleware/rate-limit.middleware';
 
 @Module({
   imports: [
