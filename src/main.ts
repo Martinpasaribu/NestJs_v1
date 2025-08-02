@@ -5,8 +5,15 @@ import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import mongoose from 'mongoose';
 import { RateLimitMiddleware } from './common/middleware/rate-limit.middleware';
 
+
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+
+  app.enableCors({
+    origin: 'http://localhost:3000', // izinkan akses dari Next.js
+    credentials: true,               // jika kamu pakai cookie/token
+  });
+
     // Middleware global
   // eslint-disable-next-line @typescript-eslint/unbound-method
   app.use(new RateLimitMiddleware().use);

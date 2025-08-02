@@ -13,4 +13,8 @@ export class AuthorService {
     const result = await this.authorModel.create(data);
     return result;
   }
+
+  async findAll(): Promise<Author[]> {
+    return this.authorModel.find().exec();
+  }
 }

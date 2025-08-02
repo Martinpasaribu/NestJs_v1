@@ -16,11 +16,23 @@ export class Author {
 
   @ApiProperty()
   @Prop({ required: true })
+  instagram: string;
+
+  @ApiProperty()
+  @Prop({ required: true })
   bio: string;
+
+  @ApiProperty()
+  @Prop({ required: true })
+  desc: string;
 
   @ApiProperty()
   @Prop()
   images: string[];
+
+  @ApiProperty()
+  @Prop()
+  imageProfile: string;
 
   @ApiProperty({ type: Date })
   @Prop()
