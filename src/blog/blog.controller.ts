@@ -1,16 +1,65 @@
 /* eslint-disable operator-linebreak */
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { Controller, Get, Post, Body, Param, Put, Delete, Query, Req } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Param,
+  Put,
+  Delete,
+  Query,
+  UploadedFiles,
+  UseInterceptors,
+  Req,
+} from '@nestjs/common';
 import { BlogService } from './blog.service';
 import { CreateBlogDto } from './dto/create-blog.dto';
 import { UpdateBlogDto } from './dto/update-blog.dto';
-import { ApiTags, ApiOperation, ApiQuery } from '@nestjs/swagger';
+import { ApiTags, ApiOperation, ApiQuery, ApiConsumes, ApiBody } from '@nestjs/swagger';
 import { Blog } from './schemas/blog-schema';
+import { ImageKitService } from 'src/config/imagekit.service';
+import { AnyFilesInterceptor } from '@nestjs/platform-express';
+import { UploadImageDto } from './dto/upload-image.dto';
 
 @ApiTags('Blog')
 @Controller('blogs')
 export class BlogController {
-  constructor(private readonly blogService: BlogService) {}
+
+  constructor(
+    private readonly blogService: BlogService,
+    private readonly imageKitService: ImageKitService,
+  ) {}
+
+  @Post('image')
+    @UseInterceptors(AnyFilesInterceptor())
+    @ApiConsumes('multipart/form-data')
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+    @ApiBody({ type: UploadImageDto })
+    @ApiOperation({ summary: 'Upload gambar ke ImageKit' })
+    async uploadImages(@UploadedFiles() files: Express.Multer.File[]) {
+      const image_bg_file = files.find((f) => f.fieldname === 'image_bg');
+      const images_files = files.filter((f) => f.fieldname === 'images');
+
+      const image_bg_url = image_bg_file
+        ? await this.imageKitService.uploadImage(image_bg_file)
+        : null;
+
+      const images_url = await Promise.all(
+        images_files.map((file) => this.imageKitService.uploadImage(file)),
+      );
+
+      return {
+        image_bg_url,
+        images_url,
+      };
+    }
+
+  @Post()
+  @ApiOperation({ summary: 'Buat blog baru' })
+  createBlog(@Body() createBlogDto: CreateBlogDto) {
+    return this.blogService.createBlog(createBlogDto);
+  }
 
   @Get()
   @ApiOperation({ summary: 'Ambil semua blog dengan pagination' })
@@ -81,6 +130,7 @@ export class BlogController {
     return this.blogService.findByArticlesList();
   }
 
+  
   @Post()
   create(@Body() createItemDto: CreateBlogDto) {
     return this.blogService.create(createItemDto);
@@ -89,6 +139,11 @@ export class BlogController {
   @Get()
   findAll() {
     return this.blogService.findAll();
+  }
+
+  @Get('/list')
+  findAllList() {
+    return this.blogService.findAllList();
   }
 
   @Put(':id')

@@ -24,6 +24,11 @@ export class BlogService {
     @Inject('REDIS_CLIENT') private readonly redis: Redis, // Redis Cloud
   ) {}
 
+  async createBlog(createBlogDto: CreateBlogDto): Promise<Blog> {
+    const blog = new this.blogModel(createBlogDto);
+    return blog.save();
+  }
+
   async getAllBlogs(
     page = 1,
     limit = 10,
@@ -269,6 +274,10 @@ async getAuthorBlog(author_name: string, page: number, limit: number) {
 
   async findAll(): Promise<Blog[]> {
     return this.blogModel.find().populate('author', 'name email bio images -_id').exec();
+  }
+
+  async findAllList(): Promise<Blog[]> {
+    return this.blogModel.find().populate('author', 'name email bio images _id').exec();
   }
 
   // async findOne(id: string): Promise<Blog> {
