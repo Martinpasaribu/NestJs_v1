@@ -9,7 +9,7 @@ import { Blog, BlogSchema } from './schemas/blog-schema';
 import { Author, AuthorSchema } from 'src/author/schemas/author-schema';
 import { RedisProvider } from 'src/config/redis.provider';
 import { RateLimitMiddleware } from 'src/common/middleware/rate-limit.middleware'; // ✅ Pastikan path sesuai
-import { ImageKitService } from 'src/config/imagekit.service';
+import { ImageKitService } from '../config/imagekit.service';
 
 @Module({
   imports: [

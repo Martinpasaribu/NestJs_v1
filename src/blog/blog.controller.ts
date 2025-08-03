@@ -18,7 +18,7 @@ import { CreateBlogDto } from './dto/create-blog.dto';
 import { UpdateBlogDto } from './dto/update-blog.dto';
 import { ApiTags, ApiOperation, ApiQuery, ApiConsumes, ApiBody } from '@nestjs/swagger';
 import { Blog } from './schemas/blog-schema';
-import { ImageKitService } from 'src/config/imagekit.service';
+import { ImageKitService } from '../config/imagekit.service';
 import { AnyFilesInterceptor } from '@nestjs/platform-express';
 import { UploadImageDto } from './dto/upload-image.dto';
 
