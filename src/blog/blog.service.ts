@@ -137,47 +137,50 @@ async getAuthorBlog(author_name: string, page: number, limit: number) {
   };
 }
 
-  async FindBlogBySlug(slug: string, id: string, ip: string) {
-    // 1. Cari berdasarkan slug
-    // eslint-disable-next-line max-len
-    let blog = await this.blogModel.findOne({ slug }).populate('author', 'name email bio images -_id').exec();
 
-    // 2. Jika tidak ada, cari berdasarkan ID
-    if (!blog && id) {
-      blog = await this.blogModel.findById(id).populate('author', 'name email bio images').exec();
-    }
+async FindBlogBySlug(slug: string, id: string, ip: string) {
 
-    if (!blog) {
-      throw new NotFoundException('Blog tidak ditemukan');
-    }
+  // 1. Cari berdasarkan slug
+  // eslint-disable-next-line max-len
+  let blog = await this.blogModel.findOne({ slug }).populate('author', 'name email bio images -_id').exec();
 
-    // 3. Cek IP di Redis
-    // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
-    const redisKey = `blog-view:${blog._id}:${ip}`;
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-    const alreadyViewed = await this.redis.get(redisKey);
-
-    if (!alreadyViewed) {
-      // Tambah view +1
-      await this.blogModel.findByIdAndUpdate(blog._id, {
-        $inc: { views: 1 },
-      });
-
-      // Simpan ke Redis agar IP ini tidak menambah view lagi dalam 24 jam
-      await this.redis.set(redisKey, '1', 'EX', 60 * 60 * 24); // 24 jam
-    }
-
-    // 4. (Opsional) Ambil related blog misal berdasarkan kategori
-    const relatedBlogs = await this.blogModel.find({
-      _id: { $ne: blog._id },
-      category: blog.category,
-    }).limit(3).populate('author', 'name email bio images -_id').exec();
-
-    return {
-      data: blog,
-      relatedBlogs,
-    };
+  // 2. Jika tidak ada, cari berdasarkan ID
+  if (!blog && id) {
+    blog = await this.blogModel.findById(id).populate('author', 'name email bio images').exec();
   }
+
+  if (!blog) {
+    throw new NotFoundException(`Blog : ${slug} tidak ditemukan `);
+  }
+
+  // 3. Cek IP di Redis
+  // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
+  const redisKey = `blog-view:${blog._id}:${ip}`;
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+  const alreadyViewed = await this.redis.get(redisKey);
+
+  if (!alreadyViewed) {
+    // Tambah view +1
+    await this.blogModel.findByIdAndUpdate(blog._id, {
+      $inc: { views: 1 },
+    });
+
+    // Simpan ke Redis agar IP ini tidak menambah view lagi dalam 24 jam
+    await this.redis.set(redisKey, '1', 'EX', 60 * 60 * 24); // 24 jam
+  }
+
+  // 4. (Opsional) Ambil related blog misal berdasarkan kategori
+  const relatedBlogs = await this.blogModel.find({
+    _id: { $ne: blog._id },
+    category: blog.category,
+  }).limit(3).populate('author', 'name email bio images -_id').exec();
+
+  return {
+    data: blog,
+    relatedBlogs,
+  };
+}
+
 
   async findByCategoryNavbar(category: string) {
     // Projection untuk menghapus properti tertentu

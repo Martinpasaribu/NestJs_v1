@@ -4,6 +4,9 @@ import Redis from 'ioredis';
 export const RedisProvider = {
   provide: 'REDIS_CLIENT',
   useFactory: () => {
-    return new Redis(process.env.REDIS_URL || 'redis://localhost:6379');
+    const url = process.env.REDIS_URL || 'rediss://localhost:6379';
+    return new Redis(url, {
+      tls: {}, // penting untuk koneksi ke Upstash
+    });
   },
 };
