@@ -142,7 +142,7 @@ async FindBlogBySlug(slug: string, id: string, ip: string) {
 
   // 1. Cari berdasarkan slug
   // eslint-disable-next-line max-len
-  let blog = await this.blogModel.findOne({ slug }).populate('author', 'name email bio images -_id').exec();
+  let blog = await this.blogModel.findOne({ slug, isDeleted:false, status:"Live" }).populate('author', 'name email bio images -_id').exec();
 
   // 2. Jika tidak ada, cari berdasarkan ID
   if (!blog && id) {
