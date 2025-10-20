@@ -8,6 +8,7 @@ import { BlogModule } from './blog/blog.module';
 import { RedisProvider } from './config/redis.provider';
 import { AuthorModule } from './author/author.module';
 import { OrdersModule } from './orders/orders.module';
+import { VisitorModule } from './visitor/visitor.module';
 
 @Module({
   imports: [
@@ -21,7 +22,8 @@ import { OrdersModule } from './orders/orders.module';
     }),
     BlogModule,
     AuthorModule,
-    OrdersModule
+    OrdersModule,
+    VisitorModule
     // RedisModule.forRootAsync({
     //   imports: [ConfigModule],
     //   inject: [ConfigService],
