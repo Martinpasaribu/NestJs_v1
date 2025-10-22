@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/restrict-template-expressions */
 import { Inject, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
@@ -137,50 +138,56 @@ async getAuthorBlog(author_name: string, page: number, limit: number) {
   };
 }
 
-
 async FindBlogBySlug(slug: string, id: string, ip: string) {
+  // 1️⃣ Cari berdasarkan slug
+  let blog = await this.blogModel
+    .findOne({ slug, isDeleted: false, status: 'Live' })
+    .populate('author', 'name email bio images -_id')
+    .populate('comments.user_key', 'name email avatar images -_id') // 🧩 populate user di comment
+    .populate('comments.replies.user_key', 'name email images -_id') // 🧩 populate user di reply
+    .populate('comments.likedBy', 'name email images -_id') // 🧩 user yang like comment
+    .populate('comments.replies.likedBy', 'name email images -_id') // 🧩 user yang like reply
+    .exec();
 
-  // 1. Cari berdasarkan slug
-  // eslint-disable-next-line max-len
-  let blog = await this.blogModel.findOne({ slug, isDeleted:false, status:"Live" }).populate('author', 'name email bio images -_id').exec();
-  //cek
-
-  // 2. Jika tidak ada, cari berdasarkan ID
+  // 2️⃣ Jika tidak ada, cari berdasarkan ID
   if (!blog && id) {
-    blog = await this.blogModel.findById(id).populate('author', 'name email bio images').exec();
+    blog = await this.blogModel
+      .findById(id)
+      .populate('author', 'name email bio images -_id')
+      .populate('comments.user_key', 'name email avatar images -_id')
+      .populate('comments.replies.user_key', 'name email images -_id')
+      .populate('comments.likedBy', 'name email images -_id')
+      .populate('comments.replies.likedBy', 'name email images -_id')
+      .exec();
   }
 
   if (!blog) {
-    throw new NotFoundException(`Blog : ${slug} tidak ditemukan `);
+    throw new NotFoundException(`Blog dengan slug: ${slug} tidak ditemukan`);
   }
 
-  // 3. Cek IP di Redis
-  // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
+  // 3️⃣ Cek IP di Redis (hindari hit view berulang)
   const redisKey = `blog-view:${blog._id}:${ip}`;
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
   const alreadyViewed = await this.redis.get(redisKey);
 
   if (!alreadyViewed) {
-    // Tambah view +1
-    await this.blogModel.findByIdAndUpdate(blog._id, {
-      $inc: { views: 1 },
-    });
-
-    // Simpan ke Redis agar IP ini tidak menambah view lagi dalam 24 jam
-    await this.redis.set(redisKey, '1', 'EX', 60 * 60 * 24); // 24 jam
+    await this.blogModel.findByIdAndUpdate(blog._id, { $inc: { view: 1 } });
+    await this.redis.set(redisKey, '1', 'EX', 60 * 60 * 24); // simpan 24 jam
   }
 
-  // 4. (Opsional) Ambil related blog misal berdasarkan kategori
-  const relatedBlogs = await this.blogModel.find({
-    _id: { $ne: blog._id },
-    category: blog.category,
-  }).limit(3).populate('author', 'name email bio images -_id').exec();
+  // 4️⃣ Ambil related blogs (misal berdasarkan kategori)
+  const relatedBlogs = await this.blogModel
+    .find({ _id: { $ne: blog._id }, category: blog.category })
+    .limit(3)
+    .populate('author', 'name email bio images -_id')
+    .exec();
 
+  // 5️⃣ Return hasil lengkap
   return {
     data: blog,
     relatedBlogs,
   };
 }
+
 
 
   async findByCategoryNavbar(category: string) {

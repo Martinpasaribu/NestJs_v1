@@ -1,9 +1,80 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import mongoose, { Document } from 'mongoose';
 import { ApiProperty } from '@nestjs/swagger';
+import mongoose, { Document } from 'mongoose';
 
 export type BlogDocument = Blog & Document;
 
+// ======================
+// 🧩 Reply Schema
+// ======================
+@Schema({ _id: true })
+export class Reply {
+  @ApiProperty({ type: String })
+  @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'User', required: false })
+  user_key: mongoose.Types.ObjectId;
+
+  @ApiProperty()
+  @Prop({ required: false })
+  name: string;
+
+  @ApiProperty()
+  @Prop({ required: false })
+  text: string;
+
+  @ApiProperty({ default: 0 })
+  @Prop({ type: Number, default: 0 })
+  likes: number;
+
+  @ApiProperty({ type: [String], default: [] })
+  @Prop({ type: [mongoose.Schema.Types.ObjectId], ref: 'User', default: [] })
+  likedBy: mongoose.Types.ObjectId[];
+
+  @ApiProperty({ type: Date })
+  @Prop({ type: Date, default: Date.now })
+  createdAt: Date;
+}
+
+export const ReplySchema = SchemaFactory.createForClass(Reply);
+
+// ======================
+// 💬 Comment Schema
+// ======================
+@Schema({ _id: true })
+export class Comment {
+  @ApiProperty({ type: String })
+  @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'User', required: false })
+  user_key: mongoose.Types.ObjectId;
+
+  @ApiProperty()
+  @Prop({ required: false })
+  name: string;
+
+  @ApiProperty()
+  @Prop({ required: false })
+  text: string;
+
+  @ApiProperty({ default: 0 })
+  @Prop({ type: Number, default: 0 })
+  likes: number;
+
+  @ApiProperty({ type: [String], default: [] })
+  @Prop({ type: [mongoose.Schema.Types.ObjectId], ref: 'User', default: [] })
+  likedBy: mongoose.Types.ObjectId[];
+
+  @ApiProperty({ type: [Reply] })
+  @Prop({ type: [ReplySchema], default: [] })
+  replies: Reply[];
+
+  @ApiProperty({ type: Date })
+  @Prop({ type: Date, default: Date.now })
+  createdAt: Date;
+}
+
+export const CommentSchema = SchemaFactory.createForClass(Comment);
+
+// ======================
+// 📰 Blog Schema
+// ======================
 @Schema({ timestamps: true, collection: 'blogs' })
 export class Blog {
   @ApiProperty()
@@ -12,11 +83,11 @@ export class Blog {
 
   @ApiProperty()
   @Prop()
-  desc: string;
+  desc?: string;
 
   @ApiProperty()
   @Prop()
-  sub_desc: string;
+  sub_desc?: string;
 
   @ApiProperty()
   @Prop({ required: true, unique: true })
@@ -24,47 +95,46 @@ export class Blog {
 
   @ApiProperty()
   @Prop()
-  content: string;
+  content?: string;
 
-  @ApiProperty({ type: [Object], required: false })
-  @Prop({ type: [Object], default: [] })
-  comment: any[];
+  @ApiProperty({ type: [Comment], default: [] })
+  @Prop({ type: [CommentSchema], default: [] })
+  comments: Comment[];
 
   @ApiProperty({ default: 0 })
-  @Prop({ default: 0 })
+  @Prop({ type: Number, default: 0 })
   view: number;
 
   @ApiProperty()
   @Prop()
-  status: string;
+  status?: string;
 
   @ApiProperty()
   @Prop()
-  image_bg: string;
+  image_bg?: string;
 
-  @ApiProperty({ type: [String] })
-  @Prop([String])
+  @ApiProperty({ type: [String], default: [] })
+  @Prop({ type: [String], default: [] })
   images: string[];
 
   @ApiProperty()
-  @Prop({ type: String }) 
-  category: string;
+  @Prop()
+  category?: string;
 
-  @ApiProperty({ type: [String] })
-  @Prop([String])
+  @ApiProperty({ type: [String], default: [] })
+  @Prop({ type: [String], default: [] })
   tags: string[];
 
-  @ApiProperty({ type: String }) // Hanya tampilkan sebagai string ID di Swagger
+  @ApiProperty({ type: String })
   @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Author', required: true })
   author: mongoose.Types.ObjectId;
 
+  @ApiProperty({ default: false })
+  @Prop({ type: Boolean, default: false })
+  isDeleted: boolean;
+
   @ApiProperty({ type: Date })
   createdAt: Date;
-
-  @ApiProperty()
-  @Prop({ default: false })
-  isDeleted: boolean;
-  
 
   @ApiProperty({ type: Date })
   updatedAt: Date;

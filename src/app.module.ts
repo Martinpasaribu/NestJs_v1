@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { Module, Logger, OnApplicationBootstrap } from '@nestjs/common';
 import { MongooseModule, InjectConnection } from '@nestjs/mongoose';
 import { ConfigModule, ConfigService } from '@nestjs/config';
@@ -9,6 +10,7 @@ import { RedisProvider } from './config/redis.provider';
 import { AuthorModule } from './author/author.module';
 import { OrdersModule } from './orders/orders.module';
 import { VisitorModule } from './visitor/visitor.module';
+import { UserModule } from './user/user_module';
 
 @Module({
   imports: [
@@ -20,6 +22,18 @@ import { VisitorModule } from './visitor/visitor.module';
       }),
       inject: [ConfigService],
     }),
+
+        // Second MongoDB connection for Users
+    MongooseModule.forRootAsync({
+      imports: [ConfigModule],
+      useFactory: (config: ConfigService) => ({
+        uri: config.get<string>('MONGODB_USER_URI'),
+      }),
+      inject: [ConfigService],
+      connectionName: 'usersConnection', // 👈 penting!
+    }),
+    
+    UserModule,
     BlogModule,
     AuthorModule,
     OrdersModule,
