@@ -4,6 +4,7 @@ import { AppModule } from './app.module';
 import { Logger } from '@nestjs/common';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import mongoose from 'mongoose';
+import { json, urlencoded } from 'express';
 // import { RateLimitMiddleware } from './common/middleware/rate-limit.middleware';
 
 
@@ -15,6 +16,10 @@ app.enableCors({
   credentials: true, // izinkan kirim cookie/token cross-origin
 });
 
+// Naikkan limit body parser express
+app.use(json({ limit: '10mb' }));
+app.use(urlencoded({ extended: true, limit: '10mb' }));
+
 // cek
     // Middleware global
   // eslint-disable-next-line @typescript-eslint/unbound-method
@@ -23,7 +28,7 @@ app.enableCors({
   const port = process.env.PORT || 5002;
   const logger = new Logger('Bootstrap');
 
-  // Swagger setup
+  
   // Swagger setup
 
   const config = new DocumentBuilder()

@@ -15,6 +15,7 @@ export default tseslint.config(
       prettier: eslintPluginPrettier,
     },
     rules: {
+      
       // 'prettier/prettier': [
       //   'error',
       //   {
