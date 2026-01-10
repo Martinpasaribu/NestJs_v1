@@ -2,8 +2,8 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document } from 'mongoose';
 import { ApiProperty } from '@nestjs/swagger';
-import { MediaObject, MediaObjectSchema } from 'src/media/schema/media.schema';
 
+import { MediaObject, MediaObjectSchema } from '../../media/schema/media.schema'
 @Schema({ 
   timestamps: true, // Otomatis menambahkan 'createdAt' dan 'updatedAt'
   toJSON: { virtuals: true }, // Agar field virtual muncul saat diubah jadi JSON
