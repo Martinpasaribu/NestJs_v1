@@ -23,6 +23,7 @@ import { AnyFilesInterceptor } from '@nestjs/platform-express';
 import { UploadImageDto } from './dto/upload-image.dto';
 
 @ApiTags('Blog')
+
 @Controller('blogs')
 export class BlogController {
 

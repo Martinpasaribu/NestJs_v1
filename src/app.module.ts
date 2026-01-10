@@ -12,7 +12,8 @@ import { OrdersModule } from './orders/orders.module';
 import { VisitorModule } from './visitor/visitor.module';
 import { UserModule } from './user/user_module';
 import { KycModule } from './kyc/kyc.module';
-
+import {MediaModule} from './media/media.module'
+import { AirdropModule } from './airdrop/airdrop.module';
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
@@ -39,7 +40,9 @@ import { KycModule } from './kyc/kyc.module';
     AuthorModule,
     OrdersModule,
     VisitorModule,
-    KycModule
+    KycModule,
+    MediaModule,
+    AirdropModule
     // RedisModule.forRootAsync({
     //   imports: [ConfigModule],
     //   inject: [ConfigService],
