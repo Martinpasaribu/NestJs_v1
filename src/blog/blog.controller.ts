@@ -51,8 +51,8 @@ export class BlogController {
       );
 
       return {
-        image_bg_url,
-        images_url,
+        image_bg_url: image_bg_url?.url || null,
+        images_url: images_url.map((img) => img.url),
       };
     }
 
