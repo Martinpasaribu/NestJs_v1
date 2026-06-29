@@ -6,7 +6,7 @@
 /* eslint-disable function-paren-newline */
 // src/modules/media/media.service.ts
 import { Injectable, BadRequestException } from '@nestjs/common';
-import { ImageKitService } from 'src/config/imagekit.service';
+import { ImageKitService } from '../config/imagekit.service';
 
 // Kita definisikan interface agar TypeScript tidak bingung
 
@@ -60,7 +60,7 @@ export class MediaService {
   async deleteFile(fileId: string) {
       try {
         return await this.imageKitService.deleteImage(fileId);
-      } catch (err) {
+      } catch (err : any) {
         console.error(`Gagal menghapus file: ${fileId}`, err.message);
       }
     }

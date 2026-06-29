@@ -7,5 +7,5 @@ export class UploadMediaDto {
     items: { type: 'string', format: 'binary' },
     description: 'Bisa kirim banyak file sekaligus dengan key yang sama atau berbeda' 
   })
-  files: any[];
+  files!: any[];
 }

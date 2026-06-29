@@ -1,5 +1,6 @@
 {
   "compilerOptions": {
+    "types": ["node", "multer"],
     "module": "commonjs",
     "declaration": true,
     "esModuleInterop": true,
@@ -11,6 +12,7 @@
     "sourceMap": true,
     "outDir": "./dist",
 
+    "ignoreDeprecations": "6.0",
     "baseUrl": "./",
     "paths": {
       "src/*": ["src/*"]
